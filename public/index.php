@@ -1,58 +1,18 @@
 <?php
 
-require_once __DIR__ . '/../vendor/autoload.php';
 
-use Dotenv\Dotenv;
-use UrlShortener\Controllers\AuthController;
-use UrlShortener\Controllers\UrlController;
-use UrlShortener\Middleware\AuthMiddleware;
-use UrlShortener\Services\JwtService;
-use UrlShortener\Services\UserService;
-use UrlShortener\Services\UrlService;
-use UrlShortener\Repositories\UserRepository;
-use UrlShortener\Repositories\UrlRepository;
+$app = require_once __DIR__ . '/../src/bootstrap.php';
+
 
 header('Content-Type: application/json');
 
-$dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-$dotenv->load();
-
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
-
-$jwtService = new JwtService();
-$userRepository = new UserRepository();
-$urlRepository = new UrlRepository();
-$userService = new UserService($userRepository, $jwtService);
-$urlService = new UrlService($urlRepository);
-
-$authController = new AuthController($userService);
-$urlController = new UrlController($urlService);
-$authMiddleware = new AuthMiddleware($jwtService);
 
 
 $method = $_SERVER['REQUEST_METHOD'];
 $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $path = trim($path, '/');
-
-function parseJsonInput() {
-    $input = file_get_contents('php://input');
-    if (empty($input)) {
-        return [];
-    }
-    
-    $data = json_decode($input, true);
-    if (json_last_error() !== JSON_ERROR_NONE) {
-        http_response_code(400);
-        echo json_encode([
-            'success' => false,
-            'message' => 'Invalid JSON data: ' . json_last_error_msg()
-        ]);
-        exit;
-    }
-    
-    return $data;
-}
 
 
 // Route handling
@@ -156,3 +116,24 @@ try {
         'trace' => $e->getTraceAsString()
     ]);
 } 
+
+
+function parseJsonInput() {
+    $input = file_get_contents('php://input');
+    if (empty($input)) {
+        return [];
+    }
+    
+    $data = json_decode($input, true);
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        http_response_code(400);
+        echo json_encode([
+            'success' => false,
+            'message' => 'Invalid JSON data: ' . json_last_error_msg()
+        ]);
+        exit;
+    }
+    
+    return $data;
+}
+
