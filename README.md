@@ -42,6 +42,9 @@ docker exec -it url-shortener-app composer install
 - API: http://localhost:8000
 - phpMyAdmin: http://localhost:8080
 
+5. Create a user and start creating short URLs
+
+
 ## API Endpoints
 
 ### Authentication
@@ -54,6 +57,7 @@ docker exec -it url-shortener-app composer install
 - GET /api/urls - List user's URLss
 - PUT /api/urls/{id} - Update URL
 - DELETE /api/urls/{id} - Delete URL
+- GET /{shorturl-key} - Get the original URL(this can be modified to redirect)
 
 
 ## Environment Variables (field for ease of use)
