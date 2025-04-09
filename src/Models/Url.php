@@ -17,6 +17,12 @@ class Url extends Model {
     private const BASE62_CHARS = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     private const SHORT_CODE_LENGTH = 6;
 
+    private const DEFAULT_CODE_LENGTH = 6;
+
+    private function getShortCodeLength(): int {
+        return (int)($_ENV['URL_LENGTH'] ?? self::DEFAULT_CODE_LENGTH);
+    }
+
     public function validate(): bool {
         $this->errors = [];
 
@@ -30,7 +36,7 @@ class Url extends Model {
             $this->addError('user_id', 'User ID is required');
         }
 
-        if (!empty($this->shortCode) && strlen($this->shortCode) > self::SHORT_CODE_LENGTH) {
+        if (!empty($this->shortCode) && strlen($this->shortCode) > $this->getShortCodeLength()) {
             $this->addError('short_code', 'Short code is too long');
         }
 
@@ -51,10 +57,10 @@ class Url extends Model {
         }
         
         // Pad with leading zeros if needed
-        $shortCode = str_pad($shortCode, self::SHORT_CODE_LENGTH, '0', STR_PAD_LEFT);
+        $shortCode = str_pad($shortCode, $this->getShortCodeLength(), '0', STR_PAD_LEFT);
         
         // Ensure the code is exactly SHORT_CODE_LENGTH characters
-        return substr($shortCode, 0, self::SHORT_CODE_LENGTH);
+        return substr($shortCode, 0, $this->getShortCodeLength());
     }
 
     public function incrementClicks(): void {
